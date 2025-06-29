@@ -5,6 +5,7 @@ import com.distribuidora.ordenes.service.OrdenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/ordenes")
@@ -17,9 +18,9 @@ public class OrdenController {
     public ResponseEntity<Orden> crear(@RequestBody Orden orden) {
         return ResponseEntity.ok(servicio.crearOrden(orden));
     }
-
-    @GetMapping("/test")
-    public String test() {
-        return "Microservicio Órdenes funcionando ✔️";
+    @GetMapping
+    public ResponseEntity<List<Orden>> listar() {
+        return ResponseEntity.ok(servicio.listarOrdenes());
     }
+
 }

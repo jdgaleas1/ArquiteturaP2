@@ -1,135 +1,174 @@
-version: '3.8'
 
 services:
-
-  # ------------------ RabbitMQ ------------------
+  # ---------------- RABBITMQ ----------------
   rabbitmq:
     image: rabbitmq:3-management
     ports:
-      - "5672:5672"   # broker
-      - "15672:15672" # UI
+      - "${RABBITMQ_PORT}:5672"
+      - "${RABBITMQ_UI_PORT}:15672"
     environment:
-      RABBITMQ_DEFAULT_USER: user
-      RABBITMQ_DEFAULT_PASS: pass
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+    restart: always
 
-  # ------------------ Órdenes ------------------
+      # ---------------- API GATEWAY ----------------
+      # gateway:
+      #build: ./gateway
+      #ports:
+      # - "${GATEWAY_PORT}:8080"
+      #depends_on:
+      #- ordenes
+      #- inventario
+      #- cobros
+      #- despacho
+    #- envios
+
+  # ---------------- ORDENES ----------------
   ordenes:
     build: ./ordenes
     ports:
-      - "8081:8080"
+      - "${ORDENES_PORT}:8081"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://ordenes-db:5432/ordenes_db
-      SPRING_DATASOURCE_USERNAME: user
-      SPRING_DATASOURCE_PASSWORD: pass
-      RABBITMQ_HOST: rabbitmq
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ordenes-db:5432/${ORDENES_DB_NAME}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - RABBITMQ_USER=${RABBITMQ_USER}
+      - RABBITMQ_PASS=${RABBITMQ_PASS}
     depends_on:
       - ordenes-db
       - rabbitmq
 
   ordenes-db:
-    image: postgres:15
+    image: postgres:17
+    container_name: ordenes-db
     environment:
-      POSTGRES_DB: ordenes_db
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: ${ORDENES_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${ORDENES_DB_PORT}:5432"
     volumes:
-      - ordenes-data:/var/lib/postgresql/data
+      - ordenes_data:/var/lib/postgresql/data
 
-  # ------------------ Inventario ------------------
+  # ---------------- INVENTARIO ----------------
   inventario:
     build: ./inventario
     ports:
-      - "8082:8080"
+      - "${INVENTARIO_PORT}:8081"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://inventario-db:5432/inventario_db
-      SPRING_DATASOURCE_USERNAME: user
-      SPRING_DATASOURCE_PASSWORD: pass
-      RABBITMQ_HOST: rabbitmq
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://inventario-db:5432/${INVENTARIO_DB_NAME}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - RABBITMQ_USER=${RABBITMQ_USER}
+      - RABBITMQ_PASS=${RABBITMQ_PASS}
     depends_on:
       - inventario-db
       - rabbitmq
 
   inventario-db:
-    image: postgres:15
+    image: postgres:17
+    container_name: inventario-db
     environment:
-      POSTGRES_DB: inventario_db
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass
-    volumes:
-      - inventario-data:/var/lib/postgresql/data
-
-  # ------------------ Despacho ------------------
-  despacho:
-    build: ./despacho
+      POSTGRES_DB: ${INVENTARIO_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "8083:8080"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://despacho-db:5432/despacho_db
-      SPRING_DATASOURCE_USERNAME: user
-      SPRING_DATASOURCE_PASSWORD: pass
-      RABBITMQ_HOST: rabbitmq
-    depends_on:
-      - despacho-db
-      - rabbitmq
-
-  despacho-db:
-    image: postgres:15
-    environment:
-      POSTGRES_DB: despacho_db
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass
+      - "${INVENTARIO_DB_PORT}:5432"
     volumes:
-      - despacho-data:/var/lib/postgresql/data
+      - inventario_data:/var/lib/postgresql/data
 
-  # ------------------ Cobros ------------------
+  # ---------------- COBROS ----------------
   cobros:
     build: ./cobros
     ports:
-      - "8084:8080"
+      - "${COBROS_PORT}:8081"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://cobros-db:5432/cobros_db
-      SPRING_DATASOURCE_USERNAME: user
-      SPRING_DATASOURCE_PASSWORD: pass
-      RABBITMQ_HOST: rabbitmq
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://cobros-db:5432/${COBROS_DB_NAME}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - RABBITMQ_USER=${RABBITMQ_USER}
+      - RABBITMQ_PASS=${RABBITMQ_PASS}
     depends_on:
       - cobros-db
       - rabbitmq
 
   cobros-db:
-    image: postgres:15
+    image: postgres:17
+    container_name: cobros-db
     environment:
-      POSTGRES_DB: cobros_db
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: ${COBROS_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${COBROS_DB_PORT}:5432"
     volumes:
-      - cobros-data:/var/lib/postgresql/data
+      - cobros_data:/var/lib/postgresql/data
 
-  # ------------------ Envíos ------------------
+  # ---------------- DESPACHO ----------------
+  despacho:
+    build: ./despacho
+    ports:
+      - "${DESPACHO_PORT}:8081"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://despacho-db:5432/${DESPACHO_DB_NAME}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - RABBITMQ_USER=${RABBITMQ_USER}
+      - RABBITMQ_PASS=${RABBITMQ_PASS}
+    depends_on:
+      - despacho-db
+      - rabbitmq
+
+  despacho-db:
+    image: postgres:17
+    container_name: despacho-db
+    environment:
+      POSTGRES_DB: ${DESPACHO_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${DESPACHO_DB_PORT}:5432"
+    volumes:
+      - despacho_data:/var/lib/postgresql/data
+
+  # ---------------- ENVIOS ----------------
   envios:
     build: ./envios
     ports:
-      - "8085:8080"
+      - "${ENVIOS_PORT}:8081"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://envios-db:5432/envios_db
-      SPRING_DATASOURCE_USERNAME: user
-      SPRING_DATASOURCE_PASSWORD: pass
-      RABBITMQ_HOST: rabbitmq
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://envios-db:5432/${ENVIOS_DB_NAME}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - RABBITMQ_USER=${RABBITMQ_USER}
+      - RABBITMQ_PASS=${RABBITMQ_PASS}
     depends_on:
       - envios-db
       - rabbitmq
 
   envios-db:
-    image: postgres:15
+    image: postgres:17
+    container_name: envios-db
     environment:
-      POSTGRES_DB: envios_db
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: ${ENVIOS_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${ENVIOS_DB_PORT}:5432"
     volumes:
-      - envios-data:/var/lib/postgresql/data
+      - envios_data:/var/lib/postgresql/data
+
+      # ---------------- FRONTEND ----------------
+      #  frontend:
+      #build: ./frontend
+      #ports:
+      #  - "${FRONTEND_PORT}:3000"
+      #    depends_on:
+  #     - gateway
 
 volumes:
-  ordenes-data:
-  inventario-data:
-  despacho-data:
-  cobros-data:
-  envios-data:
+  ordenes_data:
+  inventario_data:
+  cobros_data:
+  despacho_data:
+  envios_data:

@@ -5,6 +5,7 @@ import com.distribuidora.ordenes.repository.OrdenRepository;
 import com.distribuidora.ordenes.messaging.EventPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 @Service
 public class OrdenService {
@@ -24,4 +25,9 @@ public class OrdenService {
 
         return ordenGuardada;
     }
+
+    public List<Orden> listarOrdenes() {
+        return repo.findAll();
+    }
+
 }

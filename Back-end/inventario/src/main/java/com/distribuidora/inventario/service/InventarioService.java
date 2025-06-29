@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.List;
 
 @Service
 public class InventarioService {
@@ -29,4 +30,9 @@ public class InventarioService {
     public Producto registrarProducto(Producto producto) {
         return repo.save(producto);
     }
+
+    public List<Producto> listarProductos() {
+        return repo.findAll();
+    }
+
 }

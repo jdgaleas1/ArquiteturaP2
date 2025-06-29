@@ -5,6 +5,7 @@ import com.distribuidora.inventario.service.InventarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/inventario")
@@ -18,8 +19,9 @@ public class InventarioController {
         return ResponseEntity.ok(servicio.registrarProducto(producto));
     }
 
-    @GetMapping("/test")
-    public String test() {
-        return "✅ Microservicio Inventario en línea";
+    @GetMapping
+    public ResponseEntity<List<Producto>> listar() {
+        return ResponseEntity.ok(servicio.listarProductos());
     }
+
 }

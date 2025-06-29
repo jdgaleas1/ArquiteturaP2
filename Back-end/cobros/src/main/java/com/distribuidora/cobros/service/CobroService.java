@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
+import java.util.List;
 
 @Service
 public class CobroService {
@@ -18,9 +19,17 @@ public class CobroService {
         trans.setOrdenId(ordenId);
 
         // Simular resultado de pago (éxito o fallo)
-        boolean exito = new Random().nextBoolean();
-        trans.setEstado(exito ? "EXITO" : "FALLO");
+        //boolean exito = new Random().nextBoolean();
+     //   trans.setEstado(exito ? "EXITO" : "FALLO");
+
+        // Forzar siempre éxito
+        trans.setEstado("EXITO");
+
 
         return repo.save(trans);
     }
+    public List<Transaccion> listarTransacciones() {
+        return repo.findAll();
+    }
+
 }
