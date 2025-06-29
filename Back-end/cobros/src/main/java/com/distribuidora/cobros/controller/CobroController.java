@@ -8,15 +8,17 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/cobros")
+@RequestMapping("/cobros") // Esto asegura que la ruta sea /cobros
 public class CobroController {
 
     @Autowired
-    private CobroService servicio;
+    private CobroService cobroService;
 
     @GetMapping
     public ResponseEntity<List<Transaccion>> listarTransacciones() {
-        return ResponseEntity.ok(servicio.listarTransacciones());
+        System.out.println(">>> Entró al endpoint /cobros");
+        List<Transaccion> lista = cobroService.listarTransacciones(); // Aquí uso correctamente la variable
+        System.out.println(">>> Se recuperaron: " + lista.size() + " cobros.");
+        return ResponseEntity.ok(lista);
     }
-
 }

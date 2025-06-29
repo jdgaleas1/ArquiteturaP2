@@ -80,14 +80,14 @@ services:
   # ---------------- COBROS ----------------
   cobros:
     build: ./cobros
-    ports:
-      - "${COBROS_PORT}:8081"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://cobros-db:5432/${COBROS_DB_NAME}
-      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
-      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
-      - RABBITMQ_USER=${RABBITMQ_USER}
-      - RABBITMQ_PASS=${RABBITMQ_PASS}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://cobros-db:5432/${COBROS_DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASS: ${RABBITMQ_PASS}
+    ports:
+      - "${COBROS_PORT}:8083"
     depends_on:
       - cobros-db
       - rabbitmq

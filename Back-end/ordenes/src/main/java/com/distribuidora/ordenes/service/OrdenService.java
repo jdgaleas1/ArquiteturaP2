@@ -21,7 +21,8 @@ public class OrdenService {
         Orden ordenGuardada = repo.save(orden);
 
         // Publicar evento a RabbitMQ
-        publisher.enviarEvento("orden.creada", "Orden ID " + ordenGuardada.getId() + " creada");
+        publisher.enviarEvento("orden.creada", orden.getId().toString(), orden.getProducto());
+
 
         return ordenGuardada;
     }

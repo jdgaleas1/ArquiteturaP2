@@ -1,7 +1,8 @@
 package com.distribuidora.cobros.messaging;
 
-import com.distribuidora.cobros.service.CobroService;
 import com.distribuidora.cobros.entity.Transaccion;
+import com.distribuidora.cobros.service.CobroService;
+import com.distribuidora.cobros.messaging.EventPublisher;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,15 +20,13 @@ public class EventConsumer {
     public void recibirEvento(String mensaje) {
         System.out.println("📥 Cobros recibió: " + mensaje);
 
-        // Extraer ordenId simulado
-        String ordenId = "ORD-" + System.currentTimeMillis();
+      //  cobroService.procesarPagoDesdeMensaje(mensaje);
+        Transaccion transaccion = servicio.procesarPagoDesdeMensaje(mensaje);
 
-        Transaccion resultado = servicio.procesarPago(ordenId);
-
-        if ("EXITO".equals(resultado.getEstado())) {
-            publisher.enviarEvento("pago.exitoso", "Pago exitoso para orden " + ordenId);
+        if (transaccion != null && "EXITO".equals(transaccion.getEstado())) {
+            publisher.enviarEvento("pago.exitoso", "{\"ordenId\":\"" + transaccion.getOrdenId() + "\"}");
         } else {
-            publisher.enviarEvento("pago.fallido", "Pago fallido para orden " + ordenId);
+            publisher.enviarEvento("pago.fallido", "{\"ordenId\":\"" + (transaccion != null ? transaccion.getOrdenId() : "desconocida") + "\"}");
         }
     }
 }

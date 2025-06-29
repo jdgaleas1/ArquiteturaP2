@@ -21,3 +21,12 @@ spring:
     port: 5672
     username: ${RABBITMQ_USER}
     password: ${RABBITMQ_PASS}
+cola:
+  nombre: cobros
+
+exchange:
+  nombre: distribuidora.exchange
+
+routing:
+  key: orden.creada
+
